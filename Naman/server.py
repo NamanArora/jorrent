@@ -1,6 +1,8 @@
 import socket
+import os
+import time
 
-SIZE=1024
+SIZE=1024*2
 IP=socket.gethostname()
 
 #decide the src file
@@ -20,16 +22,22 @@ sock.listen(5)
 
 #handshake 
 c,addr=sock.accept()
+print "Connected to", addr[0]
+
+print "Sending", os.path.getsize(src)/1000 , "KB"
 
 #sending the file @1024bytes
-try:
-    byte=f.read(SIZE)
-    while byte!="":
-        c.send(byte)
+if SIZE:
+    start=time.clock()
+    try:
         byte=f.read(SIZE)
-finally:
-    print "File has been sent from server!"
-    c.send(byte)
+        while byte!="":
+            c.send(byte)
+            byte=f.read(SIZE)
+    finally:
+        print "File has been sent from server!"
+        c.send(byte)
+        print "It took", time.clock()-start, " sec"
     
 f.close()
 c.close()
